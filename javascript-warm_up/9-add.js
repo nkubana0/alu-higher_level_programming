@@ -2,10 +2,10 @@
 const firstArgument = parseInt(process.argv[2]);
 const secondArgument = parseInt(process.argv[3]);
 if (!isNaN(firstArgument) && !isNaN(secondArgument)) {
-	console.log(add(firstArgument,secondArgument));
+  console.log(add(firstArgument, secondArgument));
 } else {
-	console.log('NaN');
+  console.log('NaN');
 }
-function add (a,b) {
-	return(a + b);
+function add (a, b) {
+  return (a + b);
 }
