@@ -9,8 +9,8 @@ if (!url) {
 
 request(url, (error, response) => {
   if (error) {
-    console.error('Error: ', error.message);
+    console.error('Error:', error.message);
     process.exit(1);
   }
-  console.log('code: ', response.statusCode);
+  console.log('code:', response.statusCode);
 });
