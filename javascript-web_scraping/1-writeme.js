@@ -14,7 +14,8 @@ function writeText (filePath, fileText) {
     if (err) {
       console.error(err);
       process.exit(1);
-    });
-}
+    }
+  }
+  );
 }
 writeText(filePath, fileText);
