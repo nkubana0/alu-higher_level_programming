@@ -14,10 +14,7 @@ function writeText (filePath, fileText) {
     if (err) {
       console.error(err);
       process.exit(1);
-    } else {
-      console.log(fileText);
-    }
-  });
+    });
 }
-
+}
 writeText(filePath, fileText);
