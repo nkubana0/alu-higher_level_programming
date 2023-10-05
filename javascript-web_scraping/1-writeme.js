@@ -5,7 +5,7 @@ const filePath = process.argv[2];
 const fileText = process.argv[3];
 
 if (!filePath || !fileText) {
-  console.error('Please provide both a file path and content as arguments.');
+  console.log('Please provide both a file path and content as arguments.');
   process.exit(1);
 }
 
