@@ -2,44 +2,49 @@
 
 const request = require('request');
 
-const movieId = process.argv[2];
+if (process.argv.length > 2) {
+  const movieId = process.argv[2];
+  const apiUrl = `https://swapi.dev/api/films/${movieId}/`;
 
-if (!movieId) {
-  console.error('Please provide the Movie ID as an argument.');
-  process.exit(1);
-}
+  request.get(apiUrl, (error, response, body) => {
+    if (error) {
+      console.error(`An error occurred while making the request: ${error}`);
+      return;
+    }
 
-const apiUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}`;
+    if (response.statusCode !== 200) {
+      console.error(`Error: ${response.statusCode} - ${response.statusMessage}`);
+      return;
+    }
 
-request(apiUrl, (error, response, body) => {
-  if (error) {
-    console.error('Error:', error.message);
-    process.exit(1);
-  }
+    try {
+      const movie = JSON.parse(body);
+      const charactersUrls = movie.characters;
 
-  if (response.statusCode !== 200) {
-    console.error('Error:', `Received status code ${response.statusCode}`);
-    process.exit(1);
-  }
+      const printCharacters = (urls, index = 0) => {
+        if (index >= urls.length) {
+          return;
+        }
 
-  const film = JSON.parse(body);
-  const characters = film.characters;
+        request.get(urls[index], (error, response, body) => {
+          if (error) {
+            console.error(`An error occurred while making the request: ${error}`);
+          } else if (response.statusCode !== 200) {
+            console.error(`Error: ${response.statusCode} - ${response.statusMessage}`);
+          } else {
+            const character = JSON.parse(body);
+            console.log(character.name);
+          }
 
-  // Fetch details for each character
-  characters.forEach((characterUrl) => {
-    request(characterUrl, (charError, charResponse, charBody) => {
-      if (charError) {
-        console.error('Error fetching character details:', charError.message);
-        process.exit(1);
-      }
+          printCharacters(urls, index + 1);
+        });
+      };
 
-      if (charResponse.statusCode !== 200) {
-        console.error('Error:', `Received status code ${charResponse.statusCode}`);
-        process.exit(1);
-      }
-
-      const character = JSON.parse(charBody);
-      console.log(character.name);
-    });
+      printCharacters(charactersUrls);
+    } catch (error) {
+      console.error(`An error occurred while parsing the response: ${error}`);
+    }
   });
-});
+} else {
+  console.log('Please provide the Movie ID as an argument.');
+}
