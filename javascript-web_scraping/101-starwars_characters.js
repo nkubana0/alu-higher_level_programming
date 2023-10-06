@@ -2,49 +2,44 @@
 
 const request = require('request');
 
-if (process.argv.length > 2) {
-  const movieId = process.argv[2];
-  const apiUrl = `https://swapi.dev/api/films/${movieId}/`;
+const movieId = process.argv[2];
 
-  request.get(apiUrl, (error, response, body) => {
-    if (error) {
-      console.error(`An error occurred while making the request: ${error}`);
-      return;
-    }
-
-    if (response.statusCode !== 200) {
-      console.error(`Error: ${response.statusCode} - ${response.statusMessage}`);
-      return;
-    }
-
-    try {
-      const movie = JSON.parse(body);
-      const charactersUrls = movie.characters;
-
-      const printCharacters = (urls, index = 0) => {
-        if (index >= urls.length) {
-          return;
-        }
-
-        request.get(urls[index], (error, response, body) => {
-          if (error) {
-            console.error(`An error occurred while making the request: ${error}`);
-          } else if (response.statusCode !== 200) {
-            console.error(`Error: ${response.statusCode} - ${response.statusMessage}`);
-          } else {
-            const character = JSON.parse(body);
-            console.log(character.name);
-          }
-
-          printCharacters(urls, index + 1);
-        });
-      };
-
-      printCharacters(charactersUrls);
-    } catch (error) {
-      console.error(`An error occurred while parsing the response: ${error}`);
-    }
-  });
-} else {
-  console.log('Please provide the Movie ID as an argument.');
+if (!movieId) {
+  console.error('Please provide the Movie ID as an argument.');
+  process.exit(1);
 }
+
+const apiUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}`;
+
+request(apiUrl, (error, response, body) => {
+  if (error) {
+    console.error('Error:', error.message);
+    process.exit(1);
+  }
+
+  if (response.statusCode !== 200) {
+    console.error('Error:', `Received status code ${response.statusCode}`);
+    process.exit(1);
+  }
+
+  const film = JSON.parse(body);
+  const characters = film.characters;
+
+  // Fetch details for each character
+  characters.forEach((characterUrl) => {
+    request(characterUrl, (charError, charResponse, charBody) => {
+      if (charError) {
+        console.error('Error fetching character details:', charError.message);
+        process.exit(1);
+      }
+
+      if (charResponse.statusCode !== 200) {
+        console.error('Error:', `Received status code ${charResponse.statusCode}`);
+        process.exit(1);
+      }
+
+      const character = JSON.parse(charBody);
+      console.log(character.name);
+    });
+  });
+});
